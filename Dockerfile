@@ -1,0 +1,50 @@
+FROM python:3.8-slim as builder
+
+# 安装系统依赖
+RUN apt-get update && apt-get install -y \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+# 复制依赖文件
+COPY requirements.txt ./
+
+# 安装Python依赖
+RUN pip install --no-cache-dir --user -r requirements.txt gunicorn
+
+# 生产阶段
+FROM python:3.8-slim
+
+# 安装运行时依赖
+RUN apt-get update && apt-get install -y \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+# 创建非root用户
+RUN useradd -m -u 1000 aichat
+
+# 从构建阶段复制已安装的包
+COPY --from=builder /root/.local /home/aichat/.local
+COPY --chown=aichat:aichat . .
+
+# 切换到非root用户
+USER aichat
+
+# 设置PATH以包含用户本地安装的包
+ENV PATH="/home/aichat/.local/bin:${PATH}"
+ENV PYTHONUNBUFFERED=1
+ENV FLASK_ENV=production
+ENV PYTHONPATH="/app"
+
+# 暴露端口
+EXPOSE 5001
+
+# 健康检查
+HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
+    CMD curl -f http://localhost:5001/health || exit 1
+
+# 启动应用（使用Gunicorn）
+CMD ["gunicorn", "-c", "gunicorn.conf.py", "main:app"]

@@ -1,0 +1,59 @@
+# Zeabur 部署配置
+service: model-api-service
+
+build:
+  dockerfile: Dockerfile
+  context: .
+
+ports:
+  - 5001
+
+env:
+  # 必需配置
+  - name: FLASK_ENV
+    value: production
+  - name: PYTHONUNBUFFERED
+    value: "1"
+  
+  # AI服务API密钥配置（根据需要使用）
+  # - name: HUNYUAN_SECRET_ID
+  #   value: your_hunyuan_secret_id
+  # - name: HUNYUAN_SECRET_KEY
+  #   value: your_hunyuan_secret_key
+  # - name: QWEN_API_KEY
+  #   value: your_qwen_api_key
+  # - name: WAN_API_KEY
+  #   value: your_wan_api_key
+  # - name: WAN_VIDEO_API_KEY
+  #   value: your_wan_video_api_key
+  # - name: MODELSCOPE_API_KEY
+  #   value: your_modelscope_api_key
+  
+  # 可选配置
+  # - name: PORT
+  #   value: "5001"
+  # - name: HOST
+  #   value: 0.0.0.0
+  # - name: LOG_LEVEL
+  #   value: INFO
+  # - name: WORKER_COUNT
+  #   value: "4"
+  # - name: THREAD_COUNT
+  #   value: "2"
+  # - name: REQUEST_TIMEOUT
+  #   value: "30"
+
+resources:
+  cpu: 0.5
+  memory: 512Mi
+
+autoscaling:
+  minReplicas: 1
+  maxReplicas: 3
+  targetCPUUtilizationPercentage: 80
+
+healthCheck:
+  path: /health
+  port: 5001
+  initialDelaySeconds: 30
+  periodSeconds: 10

@@ -1,0 +1,10 @@
+# Python依赖包列表
+Flask==2.3.3
+Flask-CORS==4.0.0
+dashscope>=1.14.0
+requests==2.31.0
+tencentcloud-sdk-python>=3.0.1441
+openai==1.55.3
+
+# 安装命令: pip install -r requirements.txt
+# 或者使用虚拟环境: python -m venv venv && venv\Scripts\activate && pip install -r requirements.txt
