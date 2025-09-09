@@ -1,0 +1,18 @@
+[Unit]
+Description=AIChat Model API Service
+After=network.target
+
+[Service]
+Type=simple
+User=www-data
+WorkingDirectory=/opt/aichat/model_api_service
+ExecStart=/usr/bin/python3 /opt/aichat/model_api_service/api.py
+Restart=always
+RestartSec=5
+Environment=PYTHONUNBUFFERED=1
+Environment=FLASK_ENV=production
+StandardOutput=file:/var/log/aichat-model-api.log
+StandardError=file:/var/log/aichat-model-api-error.log
+
+[Install]
+WantedBy=multi-user.target
