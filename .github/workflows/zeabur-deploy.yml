@@ -1,0 +1,57 @@
+name: Deploy to Zeabur
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        # 确保获取所有历史记录，避免.git目录问题
+        fetch-depth: 0
+        
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+      
+    - name: Build and test Docker image
+      run: |
+        # 构建Docker镜像
+        docker build -t model-api-service .
+        
+        # 运行健康检查测试
+        docker run -d -p 5001:5001 --name test-container model-api-service
+        sleep 10
+        
+        # 检查服务是否正常启动
+        if curl -s http://localhost:5001/health | grep -q "healthy"; then
+          echo "✅ 本地测试通过"
+        else
+          echo "❌ 本地测试失败"
+          docker logs test-container
+          exit 1
+        fi
+        
+        # 清理测试容器
+        docker stop test-container
+        docker rm test-container
+        
+    - name: Zeabur Deploy
+      # 这里可以集成Zeabur的GitHub Action（如果可用）
+      # 或者使用Zeabur CLI进行部署
+      run: echo "准备部署到Zeabur..."
+      
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: docker-build-logs
+        path: |
+          /tmp/docker-build.log
+        retention-days: 7

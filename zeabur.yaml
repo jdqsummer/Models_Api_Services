@@ -1,12 +1,20 @@
 # Zeabur 部署配置
 service: model-api-service
 
+# GitHub部署时确保使用正确的构建上下文
 build:
   dockerfile: Dockerfile
   context: .
+  # 确保GitHub部署时包含所有必要文件
+  args:
+    - BUILDKIT_CONTEXT_KEEP_GIT_DIR=1
 
 ports:
-  - 5001
+  - port: 5001
+    # GitHub部署时确保端口映射正确
+    protocol: TCP
+    # 明确指定内部和外部端口映射（GitHub部署需要）
+    targetPort: 5001
 
 env:
   # 必需配置
@@ -57,3 +65,7 @@ healthCheck:
   port: 5001
   initialDelaySeconds: 30
   periodSeconds: 10
+  # GitHub部署时需要更详细的健康检查配置
+  timeoutSeconds: 5
+  successThreshold: 1
+  failureThreshold: 3
