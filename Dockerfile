@@ -10,8 +10,8 @@ WORKDIR /app
 # 复制依赖文件
 COPY requirements.txt ./
 
-# 安装Python依赖
-RUN pip install --no-cache-dir --user -r requirements.txt gunicorn
+# 安装Python依赖（安装到全局位置，避免权限问题）
+RUN pip install --no-cache-dir -r requirements.txt gunicorn
 
 # 生产阶段
 FROM python:3.8-slim
@@ -26,15 +26,13 @@ WORKDIR /app
 # 创建非root用户
 RUN useradd -m -u 1000 aichat
 
-# 从构建阶段复制已安装的包
-COPY --from=builder /root/.local /home/aichat/.local
+# 从构建阶段复制已安装的包（不再需要，因为包已全局安装）
 COPY --chown=aichat:aichat . .
 
 # 切换到非root用户
 USER aichat
 
-# 设置PATH以包含用户本地安装的包
-ENV PATH="/home/aichat/.local/bin:${PATH}"
+# 设置环境变量
 ENV PYTHONUNBUFFERED=1
 ENV FLASK_ENV=production
 ENV PYTHONPATH="/app"
