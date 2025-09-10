@@ -26,7 +26,9 @@ WORKDIR /app
 # 创建非root用户
 RUN useradd -m -u 1000 aichat
 
-# 从构建阶段复制已安装的包（不再需要，因为包已全局安装）
+# 从构建阶段复制已安装的包
+COPY --from=builder /usr/local/lib/python3.8/site-packages /usr/local/lib/python3.8/site-packages
+COPY --from=builder /usr/local/bin /usr/local/bin
 COPY --chown=aichat:aichat . .
 
 # 切换到非root用户
