@@ -341,6 +341,16 @@ def parse_wan2_video_response(response):
             print(f"查询任务失败: {result.code}, {result.message}")
             return jsonify({"error": result.message, "status": "failed"}), 500
 
+# 健康检查路由
+@app.route('/health', methods=['GET'])
+def health_check():
+    """健康检查端点"""
+    return jsonify({
+        "status": "healthy",
+        "message": "Model API Service is running",
+        "timestamp": time.time()
+    }), 200
+
 # 模型调用路由
 @app.route('/api/model', methods=['POST'])
 def model():
