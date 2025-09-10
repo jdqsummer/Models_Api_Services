@@ -9,6 +9,10 @@ import os
 from flask import Flask, request, jsonify, Response
 from flask_cors import CORS
 from dashscope import ImageSynthesis
+from dotenv import load_dotenv
+
+# 加载环境变量
+load_dotenv()
 
 from hunyuan_api import HunyuanAPI
 from tencentcloud.common.exception import TencentCloudSDKException
@@ -337,20 +341,11 @@ def parse_wan2_video_response(response):
             print(f"查询任务失败: {result.code}, {result.message}")
             return jsonify({"error": result.message, "status": "failed"}), 500
 
-# 健康检查端点
-@app.route('/api/health', methods=['GET'])
-def health_check():
-    return jsonify({
-        "status": "healthy", 
-        "service": "AIChat Model API",
-        "timestamp": time.time()
-    })
-
 # 模型调用路由
 @app.route('/api/model', methods=['POST'])
 def model():
-    data = request.json
     print("start model")
+    data = request.json
     name = data.get('name', 'qwen-max') # 模型名称
     model = data.get('model', 'Qwen/Qwen-Image') #模型
     messages = data.get('messages', '') #消息
@@ -496,7 +491,7 @@ def model():
     elif name == 'DeepSeek-R1-0528' or name == 'DeepSeek-V3' or \
         name == 'Kimi-K2-Instruct' or name == 'GLM-4.5':
         # 初始化ModleScope API接口
-        qwen = ModelScopeAPI(api_key)
+        qwen = ModelScopeAPI(os.environ.get("MODELSCOPE_API_KEY"))
         response = qwen.chat_completion(
             messages=api_messages,
             stream=stream,
@@ -511,7 +506,7 @@ def model():
         return parsed_response
     elif name == "Qwen3-Thinking" or name == 'Qwen3-32B':
         # 初始化ModleScope API接口
-        qwen = ModelScopeAPI(api_key)
+        qwen = ModelScopeAPI(os.environ.get("MODELSCOPE_API_KEY"))
         response = qwen.chat_completion(
             messages=api_messages,
             stream=stream,
@@ -525,7 +520,7 @@ def model():
         return parsed_response
     elif name == 'Qwen3-Code':
         # 初始化ModleScope API接口
-        qwen = ModelScopeAPI(api_key)
+        qwen = ModelScopeAPI(os.environ.get("MODELSCOPE_API_KEY"))
         response = qwen.chat_completion(
             messages=api_messages,
             stream=stream,
