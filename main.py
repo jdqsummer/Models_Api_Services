@@ -385,6 +385,7 @@ def model():
     print(f"模型: {model}")
     print(f"消息: {messages}")
     print(f"图片大小: {image_size}")
+    print(f"视频大小: {video_size}")
     print(f"是否流式: {stream}")  
     print(f"API消息序列: {api_messages}")
     
@@ -560,8 +561,6 @@ def model():
         return parsed_response
     else:
         return jsonify({"error": "不支持的模型"}), 400
-
-
 
 if __name__ == '__main__':
     # 在5001端口启动服务，允许外部访问  
