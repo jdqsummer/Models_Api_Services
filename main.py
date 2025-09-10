@@ -344,7 +344,6 @@ def parse_wan2_video_response(response):
 # 模型调用路由
 @app.route('/api/model', methods=['POST'])
 def model():
-    print("start model")
     data = request.json
     name = data.get('name', 'qwen-max') # 模型名称
     model = data.get('model', 'Qwen/Qwen-Image') #模型
@@ -394,7 +393,7 @@ def model():
         # 初始化混元API
         hunyuan = HunyuanAPI(
             secret_id=os.environ.get("HUNYUAN_SECRET_ID"),
-    secret_key=os.environ.get("HUNYUAN_SECRET_KEY")
+            secret_key=os.environ.get("HUNYUAN_SECRET_KEY")
         )
 
         response = hunyuan.chat_completion(
