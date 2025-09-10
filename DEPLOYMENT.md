@@ -77,6 +77,32 @@ python api.py
 ### 5. Zeabur云平台部署
 详见 [ZEABUR_DEPLOYMENT.md](./ZEABUR_DEPLOYMENT.md)
 
+### Windows系统注意事项
+
+在Windows系统上，Gunicorn无法正常运行，因为Gunicorn依赖于Unix特有的`fcntl`模块。如果您需要在Windows上进行开发或测试，请使用以下替代方案：
+
+1. **使用Flask内置服务器（开发环境）**:
+   ```bash
+    python main.py
+    ```
+ 
+ 2. **使用Waitress（生产环境替代）**:
+    ```bash
+    pip install waitress
+    waitress-serve --host=0.0.0.0 --port=5000 main:app
+    ```
+ 
+ 3. **使用Docker容器**:
+    ```bash
+    docker build -t aichat-model-api .
+    docker run -p 5000:5000 aichat-model-api
+    ```
+
+4. **使用WSL（Windows Subsystem for Linux）**:
+   在WSL中安装Linux发行版，然后在Linux环境中运行Gunicorn。
+
+对于生产环境部署，强烈建议使用Linux服务器或容器化部署（Docker/Zeabur）。
+
 **重要：在Zeabur部署时需要设置环境变量**
 - 必需变量：`FLASK_ENV=production`, `PYTHONUNBUFFERED=1`
 - AI服务API密钥（根据需要使用）：

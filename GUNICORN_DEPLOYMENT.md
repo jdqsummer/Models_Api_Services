@@ -89,8 +89,41 @@ docker run -d -p 5001:5001 \
 2. 查看 Gunicorn 日志确认实际配置
 3. 考虑进一步增加超时时间或优化模型调用
 
+## Windows 系统兼容性
+
+**重要**: Gunicorn 在 Windows 系统上无法正常运行，因为 Gunicorn 依赖于 Unix 特有的 `fcntl` 模块。如果您需要在 Windows 上进行开发或测试，请使用以下替代方案：
+
+### Windows 替代方案
+
+1. **开发环境**: 使用 Flask 内置服务器
+   ```bash
+   python main.py
+   ```
+
+2. **生产环境**: 使用 Waitress（Windows 兼容的 WSGI 服务器）
+   ```bash
+   pip install waitress
+   waitress-serve --host=0.0.0.0 --port=5000 main:app
+   ```
+
+3. **容器化部署**: 使用 Docker（推荐）
+   ```bash
+   docker build -t model-api-service .
+   docker run -p 5000:5000 model-api-service
+   ```
+
+4. **WSL**: 使用 Windows Subsystem for Linux
+   在 WSL 中安装 Linux 发行版，然后在 Linux 环境中运行 Gunicorn。
+
+### 生产环境建议
+
+对于生产环境部署，强烈建议使用：
+- Linux 服务器
+- Docker 容器化部署
+- Zeabur 云平台部署
+
 ## 版本要求
 
 - Python 3.8+
-- Gunicorn 21.2.0+
+- Gunicorn 21.2.0+（仅限 Linux/Unix 系统）
 - Flask 2.3.0+
